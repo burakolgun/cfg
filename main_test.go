@@ -1,6 +1,7 @@
-package main
+package cfg_test
 
 import (
+	. "github.com/burakolgun/cfg"
 	"testing"
 )
 

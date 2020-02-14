@@ -1,4 +1,4 @@
-module github.com/burakolgun/go-cfg
+module github.com/burakolgun/cfg
 
 go 1.13
 
