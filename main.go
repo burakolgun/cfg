@@ -100,7 +100,8 @@ func (s Settings) loadConfigurationsFromService() error {
 
 		if err != nil {
 			log.Println("configurations didn't updated")
-			return err
+			time.Sleep(s.IntervalTimeInSecond * time.Second)
+			interval <- true
 		}
 
 		for _, config := range configurationList {
