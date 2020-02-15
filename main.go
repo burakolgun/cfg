@@ -62,7 +62,7 @@ func getConfigurationsFromService(settings Settings) ([]configuration, error) {
 	req, err := http.NewRequest("GET", settings.Host+"/configurations?projectName="+settings.ProjectName, nil)
 
 	if err != nil {
-		log.Println("an error occurred while getting configurations...", err)
+		log.Println("an error occurred while getting configurations.", err)
 	}
 
 	req.Header.Add("x-correlationId", guid.New().String())
