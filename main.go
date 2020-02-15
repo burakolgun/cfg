@@ -66,7 +66,7 @@ func getConfigurationsFromService(settings Settings) ([]configuration, error) {
 	}
 
 	req.Header.Add("x-correlationId", guid.New().String())
-	req.Header.Add("x-agentName", "")
+	req.Header.Add("x-agentName", "cfg-go-client")
 
 	resp, err := client.Do(req)
 	var configurationList []configuration
