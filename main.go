@@ -12,6 +12,7 @@ import (
 )
 
 type Settings struct {
+	loader
 	Host  string
 	ProjectName          string
 	IntervalTimeInSecond time.Duration
@@ -52,14 +53,14 @@ var client = &http.Client{
 
 var configurationDtoList = make(map[string]configurationDto)
 var interval = make(chan bool, 1)
+var Complete = make(chan bool, 1)
 
 func Get(configurationKey string) configurationDto {
 	return configurationDtoList[configurationKey]
 }
 
-func getConfigurationsFromService(settings Settings) ([]configuration, error) {
-
-	req, err := http.NewRequest("GET", settings.Host+"/configurations?projectName="+settings.ProjectName, nil)
+func (s Settings) getConfigurationsFromService() ([]configuration, error) {
+	req, err := http.NewRequest("GET", s.Host+"/configurations?projectName="+s.ProjectName, nil)
 
 	if err != nil {
 		log.Println("an error occurred while getting configurations.", err)
@@ -70,22 +71,32 @@ func getConfigurationsFromService(settings Settings) ([]configuration, error) {
 
 	resp, err := client.Do(req)
 	var configurationList []configuration
-	err = json.NewDecoder(resp.Body).Decode(&configurationList)
 
-	if err != nil {
-		log.Println("an error occurred while getting configurations...", err)
-		return configurationList, err
+	if resp != nil {
+		err = json.NewDecoder(resp.Body).Decode(&configurationList)
+
+		if err != nil {
+			log.Println("an error occurred while getting configurations...", err)
+		}
+
+		defer resp.Body.Close()
+
+		return configurationList, nil
 	}
 
-	defer resp.Body.Close()
-
-	return configurationList, nil
+	return configurationList, errors.New("an error occurred")
 }
 
-func loadConfigurationsFromService(settings Settings) error {
+type loader interface {
+	loadConfigurationsFromService(settings Settings) error
+}
+
+func (s Settings) loadConfigurationsFromService() error {
+	f := true
+
 	for {
 		<-interval
-		configurationList, err := getConfigurationsFromService(settings)
+		configurationList, err := s.getConfigurationsFromService()
 
 		if err != nil {
 			log.Println("configurations didn't updated")
@@ -105,7 +116,13 @@ func loadConfigurationsFromService(settings Settings) error {
 		}
 		log.Println("configurations are reloaded")
 
-		time.Sleep(settings.IntervalTimeInSecond * time.Second)
+		if f {
+			Complete <- true
+			close(Complete)
+			f = false
+		}
+
+		time.Sleep(s.IntervalTimeInSecond * time.Second)
 		interval <- true
 	}
 }
@@ -117,7 +134,7 @@ func Init(settings Settings) error {
 	}
 
 	interval <- true
-	go loadConfigurationsFromService(settings)
+	go settings.loadConfigurationsFromService()
 
 	return nil
 }
