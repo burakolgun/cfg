@@ -55,6 +55,7 @@ var client = &http.Client{
 var configurationDtoList = make(map[string]configurationDto)
 var interval = make(chan bool, 1)
 var Complete = make(chan bool, 1)
+var defaultRequestDelayInSecond = time.Second * 5
 
 func Get(configurationKey string) configurationDto {
 	return configurationDtoList[configurationKey]
@@ -105,7 +106,7 @@ func (s Settings) loadConfigurationsFromService() error {
 			log.Printf("configurations didn't updated counter:%v", counter)
 
 			if counter < s.FirstTimeLoadRetryCount && !init {
-				time.Sleep(s.IntervalTimeInSecond * 5)
+				time.Sleep(defaultRequestDelayInSecond)
 				counter++
 				interval <- true
 				continue
