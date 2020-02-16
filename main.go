@@ -107,11 +107,13 @@ func (s Settings) loadConfigurationsFromService() error {
 			if counter < s.FirstTimeLoadRetryCount && !init {
 				counter++
 				interval <- true
+				continue
 			}
 
 			if init {
 				time.Sleep(s.IntervalTimeInSecond * time.Second)
 				interval <- true
+				continue
 			}
 
 			log.Println("arrived max retry count before first load")
@@ -142,6 +144,7 @@ func (s Settings) loadConfigurationsFromService() error {
 
 		time.Sleep(s.IntervalTimeInSecond * time.Second)
 		interval <- true
+		continue
 	}
 }
 
