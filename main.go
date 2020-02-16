@@ -102,7 +102,7 @@ func (s Settings) loadConfigurationsFromService() error {
 		<-interval
 		configurationList, err := s.getConfigurationsFromService()
 
-		if err != nil {
+		if err != nil && f {
 			log.Printf("configurations didn't updated counter:%v", counter)
 
 			if counter < s.FirstTimeLoadRetryCount && !init {
@@ -128,7 +128,7 @@ func (s Settings) loadConfigurationsFromService() error {
 				if cDto.value != config.Value {
 					cDto.value = config.Value
 					configurationDtoList[config.Key] = cDto
-					if f {
+					if !f {
 						log.Printf("changed configuration value. configurationKey: %v configuration new value: %v", config.Key, config.Value)
 					}
 				}
