@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 
@@ -12,10 +13,10 @@ import (
 )
 
 type Settings struct {
-	loader
-	Host  string
-	ProjectName          string
-	IntervalTimeInSecond time.Duration
+	Host                    string
+	ProjectName             string
+	IntervalTimeInSecond    time.Duration
+	FirstTimeLoadRetryCount int
 }
 
 type configuration struct {
@@ -48,7 +49,7 @@ type Environments struct {
 }
 
 var client = &http.Client{
-	Timeout: time.Second * 60,
+	Timeout: time.Second * 30,
 }
 
 var configurationDtoList = make(map[string]configurationDto)
@@ -93,15 +94,29 @@ type loader interface {
 
 func (s Settings) loadConfigurationsFromService() error {
 	f := true
+	init := false
+	counter := 0
 
 	for {
 		<-interval
 		configurationList, err := s.getConfigurationsFromService()
 
 		if err != nil {
-			log.Println("configurations didn't updated")
-			time.Sleep(s.IntervalTimeInSecond * time.Second)
-			interval <- true
+			log.Printf("configurations didn't updated counter:%v", counter)
+
+			if counter < s.FirstTimeLoadRetryCount && !init {
+				counter++
+				interval <- true
+			}
+
+			if init {
+				time.Sleep(s.IntervalTimeInSecond * time.Second)
+				interval <- true
+			}
+
+			log.Println("arrived max retry count before first load")
+			os.Exit(0)
+
 		}
 
 		for _, config := range configurationList {
@@ -115,10 +130,12 @@ func (s Settings) loadConfigurationsFromService() error {
 				}
 			}
 		}
+
 		log.Println("configurations are reloaded")
 
 		if f {
 			Complete <- true
+			init = true
 			close(Complete)
 			f = false
 		}
