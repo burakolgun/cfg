@@ -125,7 +125,13 @@ func (s Settings) loadConfigurationsFromService() error {
 
 		for _, config := range configurationList {
 			if cDto, ok := configurationDtoList[config.Key]; ok {
-				cDto.value = config.Value
+				if cDto.value != config.Value {
+					cDto.value = config.Value
+					configurationDtoList[config.Key] = cDto
+					if f {
+						log.Printf("changed configuration value. configurationKey: %v configuration new value: %v", config.Key, config.Value)
+					}
+				}
 			} else {
 				log.Printf("new configuration found. configurationKey: %v configuration new value: %v", config.Key, config.Value)
 				configurationDtoList[config.Key] = configurationDto{
