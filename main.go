@@ -29,11 +29,11 @@ type configurationDto struct {
 	value string
 }
 
-func (c configurationDto) String() string {
+func (c *configurationDto) String() string {
 	return c.value
 }
 
-func (c configurationDto) Int() (int, error) {
+func (c *configurationDto) Int() (int, error) {
 	n, err := strconv.Atoi(c.value)
 
 	if err != nil {
