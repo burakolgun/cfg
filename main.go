@@ -105,6 +105,7 @@ func (s Settings) loadConfigurationsFromService() error {
 			log.Printf("configurations didn't updated counter:%v", counter)
 
 			if counter < s.FirstTimeLoadRetryCount && !init {
+				time.Sleep(s.IntervalTimeInSecond * 5)
 				counter++
 				interval <- true
 				continue
