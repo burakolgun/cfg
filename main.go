@@ -24,16 +24,16 @@ type configuration struct {
 	Value string `json:"value"`
 }
 
-type configurationDto struct {
+type ConfigurationDto struct {
 	key   string
 	value string
 }
 
-func (c *configurationDto) String() string {
+func (c ConfigurationDto) String() string {
 	return c.value
 }
 
-func (c *configurationDto) Int() (int, error) {
+func (c ConfigurationDto) Int() (int, error) {
 	n, err := strconv.Atoi(c.value)
 
 	if err != nil {
@@ -52,12 +52,12 @@ var client = &http.Client{
 	Timeout: time.Second * 30,
 }
 
-var configurationDtoList = make(map[string]configurationDto)
+var configurationDtoList = make(map[string]ConfigurationDto)
 var interval = make(chan bool, 1)
 var Complete = make(chan bool, 1)
 var defaultRequestDelayInSecond = time.Second * 5
 
-func Get(configurationKey string) configurationDto {
+func Get(configurationKey string) ConfigurationDto {
 	return configurationDtoList[configurationKey]
 }
 
@@ -93,7 +93,7 @@ type loader interface {
 	loadConfigurationsFromService(settings Settings) error
 }
 
-func (s Settings) loadConfigurationsFromService() error {
+func (s Settings) loadConfigurationsFromService() {
 	f := true
 	init := false
 	counter := 0
@@ -136,7 +136,7 @@ func (s Settings) loadConfigurationsFromService() error {
 				}
 			} else {
 				log.Printf("new configuration found. configurationKey: %v configuration value: %v", config.Key, config.Value)
-				configurationDtoList[config.Key] = configurationDto{
+				configurationDtoList[config.Key] = ConfigurationDto{
 					key:   config.Key,
 					value: config.Value,
 				}
@@ -158,14 +158,7 @@ func (s Settings) loadConfigurationsFromService() error {
 	}
 }
 
-func Init(settings Settings) error {
-	if len(settings.Host) == 0 || len(settings.ProjectName) == 0 {
-		log.Println("Settings must be valid")
-		return errors.New("settings must be valid")
-	}
-
+func Init(settings Settings) {
 	interval <- true
 	go settings.loadConfigurationsFromService()
-
-	return nil
 }
