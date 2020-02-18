@@ -5,7 +5,6 @@ import (
 	"errors"
 	"log"
 	"net/http"
-	"os"
 	"strconv"
 	"time"
 
@@ -37,7 +36,7 @@ func (c ConfigurationDto) Int() int {
 	n, err := strconv.Atoi(c.value)
 
 	if err != nil {
-		os.Exit(0)
+		panic(err)
 	}
 
 	return n
@@ -47,7 +46,7 @@ func (c ConfigurationDto) Bool() bool {
 	n, err := strconv.ParseBool(c.value)
 
 	if err != nil {
-		os.Exit(0)
+		panic(err)
 	}
 
 	return n
@@ -129,9 +128,7 @@ func (s Settings) loadConfigurationsFromService() {
 				continue
 			}
 
-			log.Println("arrived max retry count before first load")
-			os.Exit(0)
-
+			panic("arrived max retry count before first load")
 		}
 
 		for _, config := range configurationList {
@@ -143,7 +140,6 @@ func (s Settings) loadConfigurationsFromService() {
 
 					cDto.value = config.Value
 					configurationDtoList[config.Key] = cDto
-
 				}
 			} else {
 				log.Printf("new configuration found. configurationKey: %v configuration value: %v", config.Key, config.Value)
