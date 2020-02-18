@@ -33,24 +33,24 @@ func (c ConfigurationDto) String() string {
 	return c.value
 }
 
-func (c ConfigurationDto) Int() (int, error) {
+func (c ConfigurationDto) Int() int {
 	n, err := strconv.Atoi(c.value)
 
 	if err != nil {
-		return 0, err
+		os.Exit(0)
 	}
 
-	return n, nil
+	return n
 }
 
-func (c ConfigurationDto) Bool() (bool, error) {
+func (c ConfigurationDto) Bool() bool {
 	n, err := strconv.ParseBool(c.value)
 
 	if err != nil {
-		return false, err
+		os.Exit(0)
 	}
 
-	return n, nil
+	return n
 }
 
 
