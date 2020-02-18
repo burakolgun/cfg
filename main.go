@@ -43,6 +43,17 @@ func (c ConfigurationDto) Int() (int, error) {
 	return n, nil
 }
 
+func (c ConfigurationDto) Bool() (bool, error) {
+	n, err := strconv.ParseBool(c.value)
+
+	if err != nil {
+		return false, err
+	}
+
+	return n, nil
+}
+
+
 type Environments struct {
 	FilePath string
 	FileName string
