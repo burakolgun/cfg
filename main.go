@@ -150,8 +150,6 @@ func (s Settings) loadConfigurationsFromService() {
 			}
 		}
 
-		log.Println("configurations are reloaded")
-
 		if f {
 			Complete <- true
 			init = true
