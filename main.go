@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 
@@ -50,6 +51,10 @@ func (c ConfigurationDto) Bool() bool {
 	}
 
 	return n
+}
+
+func GetEnvironmentVariable(v string) string {
+	return os.Getenv(v)
 }
 
 
@@ -100,7 +105,7 @@ func (s Settings) getConfigurationsFromService() ([]configuration, error) {
 }
 
 type loader interface {
-	loadConfigurationsFromService(settings Settings) error
+	loadConfigurationsFromService(settings Settings)
 }
 
 func (s Settings) loadConfigurationsFromService() {
