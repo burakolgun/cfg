@@ -53,10 +53,12 @@ func (c ConfigurationDto) Bool() bool {
 	return n
 }
 
-func GetEnvironmentVariable(v string) string {
-	return os.Getenv(v)
+func GetEnvironmentVariable(v string) ConfigurationDto {
+	return ConfigurationDto{
+		key:   v,
+		value: os.Getenv(v),
+	}
 }
-
 
 type Environments struct {
 	FilePath string
