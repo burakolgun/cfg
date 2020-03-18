@@ -96,6 +96,7 @@ func (s Settings) getConfigurationsFromService() ([]configuration, error) {
 
 		if err != nil {
 			log.Println("an error occurred while getting configurations...", err)
+			return []configuration{}, errors.New("an error occurred while decoding response")
 		}
 
 		defer resp.Body.Close()
