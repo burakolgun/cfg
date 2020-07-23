@@ -166,13 +166,13 @@ func (s Settings) loadConfigurationsFromService() {
 			close(Complete)
 			f = false
 
-			if s.IntervalTimeInSecond <= time.Second * 1 {
+			if s.IntervalTimeInSecond < time.Second * 1 {
 				s.IntervalTimeInSecond = time.Second * 60
 				log.Printf("wrong intervalTimeInSecond value, will be set as: %s", s.IntervalTimeInSecond)
 			}
 		}
 
-		time.Sleep(s.IntervalTimeInSecond * time.Second)
+		time.Sleep(s.IntervalTimeInSecond)
 		interval <- true
 		continue
 	}
