@@ -3,6 +3,7 @@ package cfg
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -85,10 +86,11 @@ func (s Settings) getConfigurationsFromService() ([]configuration, error) {
 		log.Println("an error occurred while getting configurations.", err)
 	}
 
-	req.Header.Add("x-correlationId", guid.New().String())
-	req.Header.Add("x-agentName", "cfg-go-client")
+	req.Header.Add("x-correlationid", guid.New().String())
+	req.Header.Add("x-agentname", "cfg-go-client")
 
 	resp, err := client.Do(req)
+	fmt.Println("requ")
 	var configurationList []configuration
 
 	if resp != nil {
@@ -163,6 +165,11 @@ func (s Settings) loadConfigurationsFromService() {
 			init = true
 			close(Complete)
 			f = false
+
+			if s.IntervalTimeInSecond <= time.Second * 1 {
+				s.IntervalTimeInSecond = time.Second * 60
+				log.Printf("wrong intervalTimeInSecond value, will be set as: %s", s.IntervalTimeInSecond)
+			}
 		}
 
 		time.Sleep(s.IntervalTimeInSecond * time.Second)

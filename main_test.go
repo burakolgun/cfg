@@ -8,23 +8,19 @@ import (
 )
 
 func TestInit(t *testing.T) {
-	expected := "settings must be valid"
 
-	actual := Init(Settings{
-		Host:  "",
-		ProjectName:          "",
-		IntervalTimeInSecond: 3,
+	Init(Settings{
+		Host:                 "https://stageconfigurationapi.trendyol.com",
+		ProjectName:          "refund_consumer",
+		IntervalTimeInSecond: 0,
+		FirstTimeLoadRetryCount: 5,
 	})
 
-	if true == <-Complete {
-		fmt.Println("done")
-	}
+	fmt.Println(GetEnvironmentVariable("CONFIGURATION_API_URL"))
 
-	if actual == nil || actual.Error() != expected {
-		time.Sleep(time.Minute * 1)
-		t.Errorf("Init() = %q, want %q", actual, expected)
+	<-Complete
+	for {
+		time.Sleep(time.Second * 1)
+		fmt.Println(Get("CFG_TEST2").String())
 	}
-}
-
-func TestFirstLoadInformation(t *testing.T) {
 }
